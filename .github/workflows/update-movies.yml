@@ -2,8 +2,13 @@ name: Update Movie Database
 
 on:
   schedule:
+    # اجرا هر روز ساعت 00:00 UTC
     - cron: '0 0 * * *'
-  workflow_dispatch:
+  workflow_dispatch:  # برای اجرای دستی
+
+# تنظیم دسترسی‌های مورد نیاز برای آپلود در Releases
+permissions:
+  contents: write
 
 jobs:
   fetch-movies:
@@ -25,7 +30,7 @@ jobs:
       
       - name: Fetch movies from TMDB
         env:
-          TMDB_ACCESS_TOKEN: ${{ secrets.TMDB_ACCESS_TOKEN }}  # تغییر نام به ACCESS_TOKEN
+          TMDB_ACCESS_TOKEN: ${{ secrets.TMDB_ACCESS_TOKEN }}
         run: python fetch_movies.py
       
       - name: Upload to Release
@@ -37,3 +42,4 @@ jobs:
           omitBody: true
           omitName: true
           replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
