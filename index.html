@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Database - Search & Discover</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .search-box button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .search-box button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filters select, .filters input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .year-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .year-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .year-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .year-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .movie-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .movie-poster {
+            width: 100%;
+            height: 375px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        
+        .movie-info {
+            padding: 15px;
+        }
+        
+        .movie-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .movie-year {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        
+        .movie-rating {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-modal:hover {
+            color: #000;
+        }
+        
+        @media (max-width: 768px) {
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .movie-poster {
+                height: 225px;
+            }
+        }
+        
+        .stats {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Movie Database</h1>
+            <p>Search and discover movies from 1990 to 2026</p>
+        </div>
+        
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search movies by title, actor, director...">
+                <button onclick="searchMovies()">🔍 Search</button>
+            </div>
+            
+            <div class="filters">
+                <select id="yearFilter">
+                    <option value="all">All Years</option>
+                </select>
+                
+                <select id="ratingFilter">
+                    <option value="all">All Ratings</option>
+                    <option value="7">7+ ★★★★</option>
+                    <option value="8">8+ ★★★★★</option>
+                    <option value="9">9+ ★★★★★★</option>
+                </select>
+            </div>
+            
+            <div class="year-buttons" id="yearButtons"></div>
+        </div>
+        
+        <div class="stats" id="stats"></div>
+        
+        <div id="moviesGrid" class="movies-grid">
+            <div class="loading">Loading movie database...</div>
+        </div>
+    </div>
+    
+    <!-- Modal for movie details -->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let allMovies = [];
+        let currentYear = 'all';
+        
+        async function loadAllMovies() {
+            try {
+                // اول ایندکس رو می‌گیریم تا بدونیم چند سال داریم
+                const indexRes = await fetch('https://api.github.com/repos/' + window.location.pathname.split('/')[1] + '/releases/latest');
+                const release = await indexRes.json();
+                
+                // بارگذاری فایل‌های JSON از Releases
+                const years = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992, 1991, 1990];
+                
+                for (const year of years) {
+                    try {
+                        const movieFile = release.assets.find(asset => asset.name === `movies_${year}.json`);
+                        if (movieFile) {
+                            const response = await fetch(movieFile.browser_download_url);
+                            const data = await response.json();
+                            if (data.movies && data.movies.length > 0) {
+                                allMovies.push(...data.movies);
+                                console.log(`Loaded ${data.movies.length} movies from ${year}`);
+                            }
+                        }
+                    } catch (e) {
+                        console.log(`No data for ${year}`);
+                    }
+                }
+                
+                updateStats();
+                displayMovies(allMovies);
+                populateYearFilter();
+                
+            } catch (error) {
+                console.error('Error loading movies:', error);
+                document.getElementById('moviesGrid').innerHTML = '<div class="loading">❌ Error loading database. Please try again later.</div>';
+            }
+        }
+        
+        function updateStats() {
+            const uniqueMovies = new Map();
+            allMovies.forEach(m => uniqueMovies.set(m.id, m));
+            const uniqueCount = uniqueMovies.size;
+            
+            const avgRating = (allMovies.reduce((sum, m) => sum + m.vote_average, 0) / allMovies.length).toFixed(1);
+            
+            document.getElementById('stats').innerHTML = `
+                📊 ${uniqueCount.toLocaleString()} movies | ⭐ Average rating: ${avgRating}/10 | 🎬 ${allMovies.length} total entries
+            `;
+        }
+        
+        function populateYearFilter() {
+            const years = [...new Set(allMovies.map(m => new Date(m.release_date).getFullYear()).filter(y => y))].sort((a,b) => b-a);
+            const select = document.getElementById('yearFilter');
+            const buttonsDiv = document.getElementById('yearButtons');
+            
+            years.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                select.appendChild(option);
+                
+                const button = document.createElement('button');
+                button.className = 'year-btn';
+                button.textContent = year;
+                button.onclick = () => {
+                    currentYear = year;
+                    document.getElementById('yearFilter').value = year;
+                    filterMovies();
+                };
+                buttonsDiv.appendChild(button);
+            });
+        }
+        
+        function searchMovies() {
+            filterMovies();
+        }
+        
+        function filterMovies() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const yearValue = document.getElementById('yearFilter').value;
+            const ratingValue = document.getElementById('ratingFilter').value;
+            
+            let filtered = allMovies;
+            
+            if (searchTerm) {
+                filtered = filtered.filter(movie => 
+                    movie.title.toLowerCase().includes(searchTerm) ||
+                    (movie.overview && movie.overview.toLowerCase().includes(searchTerm)) ||
+                    (movie.credits && movie.credits.cast.some(c => c.name.toLowerCase().includes(searchTerm))) ||
+                    (movie.credits && movie.credits.crew.some(c => c.name.toLowerCase().includes(searchTerm)))
+                );
+            }
+            
+            if (yearValue !== 'all') {
+                filtered = filtered.filter(movie => new Date(movie.release_date).getFullYear() == yearValue);
+            }
+            
+            if (ratingValue !== 'all') {
+                filtered = filtered.filter(movie => movie.vote_average >= parseFloat(ratingValue));
+            }
+            
+            displayMovies(filtered);
+            
+            document.getElementById('stats').innerHTML = `
+                🔍 Found ${filtered.length} movies | ⭐ Avg rating: ${(filtered.reduce((sum, m) => sum + m.vote_average, 0) / filtered.length || 0).toFixed(1)}/10
+            `;
+        }
+        
+        function displayMovies(movies) {
+            const grid = document.getElementById('moviesGrid');
+            
+            if (movies.length === 0) {
+                grid.innerHTML = '<div class="loading">😢 No movies found. Try different search terms!</div>';
+                return;
+            }
+            
+            grid.innerHTML = movies.slice(0, 100).map(movie => `
+                <div class="movie-card" onclick="showMovieDetails(${movie.id})">
+                    <img class="movie-poster" src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${movie.title}">
+                    <div class="movie-info">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-year">${movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}</div>
+                        <div class="movie-rating">⭐ ${movie.vote_average}/10</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showMovieDetails(movieId) {
+            const movie = allMovies.find(m => m.id === movieId);
+            if (!movie) return;
+            
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <h2>${movie.title}</h2>
+                ${movie.tagline ? `<p><em>${movie.tagline}</em></p>` : ''}
+                <img src="https://image.tmdb.org/t/p/w500${movie.backdrop_path || movie.poster_path}" style="width:100%; border-radius:10px; margin:15px 0;">
+                <p><strong>⭐ Rating:</strong> ${movie.vote_average}/10 (${movie.vote_count} votes)</p>
+                <p><strong>📅 Release Date:</strong> ${movie.release_date || 'N/A'}</p>
+                <p><strong>⏱️ Runtime:</strong> ${movie.runtime || 'N/A'} minutes</p>
+                <p><strong>🎭 Genres:</strong> ${movie.genres.map(g => g.name).join(', ') || 'N/A'}</p>
+                <p><strong>📖 Overview:</strong> ${movie.overview || 'No overview available.'}</p>
+                
+                ${movie.credits && movie.credits.cast.length > 0 ? `
+                    <h3>Cast</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin:15px 0;">
+                        ${movie.credits.cast.slice(0, 10).map(actor => `
+                            <div style="text-align:center; width:80px;">
+                                <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w185' + actor.profile_path : 'https://via.placeholder.com/80x120?text=No+Image'}" style="width:80px; border-radius:5px;">
+                                <div style="font-size:12px; margin-top:5px;">${actor.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
+                ${movie.keywords && movie.keywords.keywords.length > 0 ? `
+                    <h3>Keywords</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin:15px 0;">
+                        ${movie.keywords.keywords.slice(0, 15).map(k => `<span style="background:#f0f0f0; padding:5px 12px; border-radius:20px; font-size:12px;">${k.name}</span>`).join('')}
+                    </div>
+                ` : ''}
+                
+                ${movie.recommendations && movie.recommendations.results.length > 0 ? `
+                    <h3>Recommendations</h3>
+                    <div style="display:flex; overflow-x:auto; gap:15px; margin:15px 0;">
+                        ${movie.recommendations.results.slice(0, 10).map(rec => `
+                            <div style="min-width:120px; text-align:center; cursor:pointer;" onclick="showMovieDetails(${rec.id})">
+                                <img src="https://image.tmdb.org/t/p/w185${rec.poster_path}" style="width:120px; border-radius:8px;">
+                                <div style="font-size:12px; margin-top:5px;">${rec.title}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('movieModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('movieModal').style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('movieModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+        
+        // بارگذاری دیتابیس
+        loadAllMovies();
+    </script>
+</body>
+</html>
