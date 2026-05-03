@@ -69,20 +69,41 @@
 <script>
     // ============================================================
     // 🔴 فقط این خط را به نام مخزن خود تغییر دهید 🔴
-    const REPO_NAME = 'movie-database';   // ← اینجا نام مخزن خود را بنویس
+    const REPO_OWNER = 'khashayardev';   // ← نام کاربری شما
+    const REPO_NAME = 'movie-database';   // ← نام مخزن شما
     // ============================================================
     const TAG = 'v1.0.0';
     
-    function getJsonUrl(year) {
-        return `https://raw.githubusercontent.com/${REPO_NAME}/${TAG}/data/movies_${year}.json`;
-    }
-    
     let allMovies = [];
     let moviesMap = new Map();
+    let movieAssets = {}; // ذخیره URL فایل‌ها
     
-    async function loadYear(year) {
+    // دریافت لیست فایل‌ها از Release API
+    async function fetchReleaseAssets() {
+        const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/tags/${TAG}`;
         try {
-            const resp = await fetch(getJsonUrl(year));
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const release = await response.json();
+            
+            // ذخیره URL همه فایل‌های movies_*.json
+            for (const asset of release.assets) {
+                if (asset.name.match(/^movies_\d{4}\.json$/)) {
+                    const year = parseInt(asset.name.match(/\d{4}/)[0]);
+                    movieAssets[year] = asset.browser_download_url;
+                }
+            }
+            console.log(`Found ${Object.keys(movieAssets).length} movie files`);
+            return movieAssets;
+        } catch (err) {
+            console.error('Failed to fetch release:', err);
+            throw err;
+        }
+    }
+    
+    async function loadYear(year, url) {
+        try {
+            const resp = await fetch(url);
             if (!resp.ok) return 0;
             const data = await resp.json();
             if (data && data.movies) {
@@ -104,14 +125,19 @@
     }
     
     async function loadAll() {
-        const years = [];
-        for (let y = 1990; y <= 2026; y++) years.push(y);
-        let total = 0;
         const stats = document.getElementById('statsBar');
+        const years = Object.keys(movieAssets).map(Number).sort((a,b) => a - b);
+        
+        if (years.length === 0) {
+            throw new Error('No movie files found in release. Make sure files are named movies_1990.json etc.');
+        }
+        
+        let total = 0;
         for (let i = 0; i < years.length; i++) {
             const y = years[i];
+            const url = movieAssets[y];
             stats.innerHTML = `<span><i class="fas fa-cloud-download-alt"></i> Loading ${y}... (${i+1}/${years.length})</span>`;
-            const count = await loadYear(y);
+            const count = await loadYear(y, url);
             if (count > 0) total += count;
             await new Promise(r => setTimeout(r, 30));
         }
@@ -168,8 +194,8 @@
             filtered = filtered.filter(m => 
                 m.title?.toLowerCase().includes(term) ||
                 m.overview?.toLowerCase().includes(term) ||
-                m.credits?.cast?.some(c => c.name?.toLowerCase().includes(term)) ||
-                m.credits?.crew?.some(c => c.name?.toLowerCase().includes(term))
+                (m.credits && m.credits.cast && m.credits.cast.some(c => c.name?.toLowerCase().includes(term))) ||
+                (m.credits && m.credits.crew && m.credits.crew.some(c => c.name?.toLowerCase().includes(term)))
             );
         }
         if (year !== 'all') {
@@ -204,13 +230,30 @@
     function showModal(movie) {
         const modalBody = document.getElementById('modalBody');
         const backdrop = movie.backdrop_path ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}` : (movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : '');
+        const genres = movie.genres?.map(g => g.name).join(', ') || '';
         modalBody.innerHTML = `
             <h2>${escapeHtml(movie.title)}</h2>
+            ${movie.tagline ? `<p style="color:#a5b4fc;">${escapeHtml(movie.tagline)}</p>` : ''}
             ${backdrop ? `<img class="modal-poster" src="${backdrop}">` : ''}
-            <p><strong>⭐ ${movie.vote_average?.toFixed(1)}/10</strong> (${movie.vote_count} votes)</p>
-            <p>📅 ${movie.release_date || 'N/A'} | ⏱️ ${movie.runtime || '?'} min</p>
-            <p>🎭 Genres: ${movie.genres?.map(g=>g.name).join(', ')||'—'}</p>
-            <p>📖 ${escapeHtml(movie.overview || 'No overview')}</p>
+            <div style="display:flex; flex-wrap:wrap; gap:1rem; margin:1rem 0;">
+                <span><i class="fas fa-star" style="color:#fbbf24"></i> ${movie.vote_average?.toFixed(1)}/10 (${movie.vote_count} votes)</span>
+                <span><i class="fas fa-calendar-alt"></i> ${movie.release_date || 'N/A'}</span>
+                <span><i class="fas fa-clock"></i> ${movie.runtime || '?'} min</span>
+                ${genres ? `<span><i class="fas fa-tags"></i> ${genres}</span>` : ''}
+            </div>
+            <p><strong>📖 Overview</strong><br>${escapeHtml(movie.overview || 'No overview available.')}</p>
+            ${movie.credits && movie.credits.cast && movie.credits.cast.length ? `
+                <hr style="border-color:#334155; margin:1rem 0;">
+                <h3><i class="fas fa-users"></i> Cast</h3>
+                <div style="display:flex; flex-wrap:wrap; gap:0.8rem; margin-top:0.5rem;">
+                    ${movie.credits.cast.slice(0,8).map(actor => `
+                        <div style="text-align:center; width:70px;">
+                            <img style="width:60px;height:60px;object-fit:cover;border-radius:50%;" src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w185'+actor.profile_path : 'https://placehold.co/60x60/1e293b/475569?text=?'}" loading="lazy">
+                            <div style="font-size:11px; margin-top:4px;">${escapeHtml(actor.name)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
         `;
         document.getElementById('detailModal').style.display = 'flex';
     }
@@ -221,6 +264,7 @@
         document.getElementById('statsBar').innerHTML = `<span><i class="fas fa-filter"></i> Showing ${filtered.length} of ${allMovies.length} movies</span>`;
     }
     
+    // رویدادها
     document.getElementById('searchBtn').onclick = applyFilters;
     document.getElementById('searchInput').onkeypress = e => { if(e.key === 'Enter') applyFilters(); };
     document.getElementById('yearSelect').onchange = applyFilters;
@@ -228,17 +272,32 @@
     document.getElementById('modalCloseBtn').onclick = () => document.getElementById('detailModal').style.display = 'none';
     window.onclick = e => { if(e.target === document.getElementById('detailModal')) document.getElementById('detailModal').style.display = 'none'; };
     
+    // اجرای اصلی
     (async function() {
         const stats = document.getElementById('statsBar');
         try {
+            // مرحله 1: دریافت لیست فایل‌ها از Release API
+            stats.innerHTML = `<span><i class="fas fa-spinner fa-pulse"></i> Fetching file list from GitHub...</span>`;
+            await fetchReleaseAssets();
+            
+            if (Object.keys(movieAssets).length === 0) {
+                throw new Error('No movie files found in release. Expected files like movies_1990.json');
+            }
+            
+            // مرحله 2: بارگذاری داده‌ها
             await loadAll();
-            if (allMovies.length === 0) throw new Error('No movies found. Check release tag and file paths.');
+            
+            if (allMovies.length === 0) {
+                throw new Error('No movies loaded. File format may be incorrect.');
+            }
+            
             populateUI();
             applyFilters();
             stats.innerHTML = `<span><i class="fas fa-check-circle"></i> ✅ ${allMovies.length} movies · ${extractYears().length} years</span>`;
         } catch(err) {
+            console.error(err);
             stats.innerHTML = `<span><i class="fas fa-exclamation-triangle"></i> ${err.message}</span>`;
-            document.getElementById('moviesContainer').innerHTML = `<div class="loading-skeleton">❌ ${err.message}<br>Make sure:<br>1. Release tag '${TAG}' exists<br>2. Files like 'movies_1990.json' are in /data/ folder<br>3. Repository name is correct: '${REPO_NAME}'</div>`;
+            document.getElementById('moviesContainer').innerHTML = `<div class="loading-skeleton">❌ ${err.message}<br><br>Make sure:<br>1. Release tag '${TAG}' exists<br>2. Files are named 'movies_1990.json' to 'movies_2026.json'<br>3. Repository name is correct: '${REPO_OWNER}/${REPO_NAME}'</div>`;
         }
     })();
 </script>
