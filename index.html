@@ -3,183 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Database - Search & Discover</title>
+    <title>MovieBase 🎬 | Ultimate Movie Discovery</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e1a;
+            color: #eef5ff;
         }
-        
+
+        /* custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e2a3a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 10px;
+        }
+
+        .bg-gradient {
+            background: radial-gradient(circle at 20% 30%, #0f172a, #030614);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)), 
+                              radial-gradient(1px 1px at 60px 80px, #f8fafc, rgba(0,0,0,0));
+            background-size: 200px 200px, 150px 150px;
+            background-repeat: repeat;
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: -1;
+        }
+
         .container {
-            max-width: 1400px;
+            max-width: 1440px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 1.5rem;
         }
-        
-        .header {
+
+        /* header */
+        .hero {
             text-align: center;
-            padding: 40px 0;
-            color: white;
+            margin: 2rem 0 2rem 0;
         }
-        
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #c084fc, #60a5fa, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.02em;
         }
-        
-        .header p {
+        .hero p {
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        /* search card */
+        .glass-card {
+            background: rgba(15, 25, 45, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s;
+        }
+
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .search-wrapper {
+            flex: 2;
+            position: relative;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
             font-size: 1.2rem;
-            opacity: 0.9;
         }
-        
-        .search-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .search-box {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .search-box input {
-            flex: 1;
-            padding: 15px;
+        #searchInput {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
             font-size: 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            transition: all 0.3s;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 2rem;
+            color: white;
+            transition: 0.2s;
         }
-        
-        .search-box input:focus {
+        #searchInput:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
         }
-        
-        .search-box button {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .btn-primary {
+            background: linear-gradient(105deg, #4f46e5, #7c3aed);
             border: none;
-            border-radius: 10px;
+            padding: 0 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            color: white;
             cursor: pointer;
-            font-size: 1rem;
-            transition: transform 0.2s;
-        }
-        
-        .search-box button:hover {
-            transform: translateY(-2px);
-        }
-        
-        .filters {
+            transition: 0.2s;
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
             align-items: center;
+            gap: 8px;
+            font-size: 1rem;
         }
-        
-        .filters select, .filters input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px -5px #4f46e5;
         }
-        
-        .year-buttons {
+
+        .filter-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 15px;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
         }
-        
-        .year-btn {
-            padding: 8px 16px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 20px;
+        .filter-select {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            color: white;
             cursor: pointer;
-            transition: all 0.3s;
         }
-        
-        .year-btn:hover {
-            background: #667eea;
+        .year-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+        .chip {
+            background: #1e293b;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #cbd5e1;
+        }
+        .chip.active, .chip:hover {
+            background: #4f46e5;
             color: white;
             transform: translateY(-2px);
         }
-        
-        .year-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+
+        /* stats bar */
+        .stats-bar {
+            background: #0f172a80;
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 0.8rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.9rem;
+            border: 1px solid #2d3a5e;
         }
-        
+
+        /* movie grid */
         .movies-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 1.8rem;
         }
-        
         .movie-card {
-            background: white;
-            border-radius: 10px;
+            background: #111827cc;
+            backdrop-filter: blur(4px);
+            border-radius: 1.5rem;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             cursor: pointer;
+            border: 1px solid #2d3748;
         }
-        
         .movie-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 35px -12px black;
+            border-color: #7c3aed;
         }
-        
-        .movie-poster {
+        .poster {
             width: 100%;
-            height: 375px;
+            aspect-ratio: 2 / 3;
             object-fit: cover;
-            background: #f0f0f0;
+            background: #0f172a;
         }
-        
         .movie-info {
-            padding: 15px;
+            padding: 1rem;
         }
-        
         .movie-title {
+            font-weight: 700;
             font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #333;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        
-        .movie-year {
-            color: #666;
-            font-size: 0.85rem;
-            margin-bottom: 5px;
+        .movie-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 0.5rem;
         }
-        
-        .movie-rating {
-            color: #ffc107;
-            font-weight: bold;
+        .rating {
+            color: #fbbf24;
+            font-weight: 600;
         }
-        
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: white;
-            font-size: 1.2rem;
-        }
-        
+
+        /* modal premium */
         .modal {
             display: none;
             position: fixed;
@@ -187,289 +254,429 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-card {
+            background: #0f172a;
+            max-width: 820px;
+            width: 90%;
+            max-height: 85vh;
             overflow-y: auto;
-        }
-        
-        .modal-content {
-            background: white;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 30px;
-            border-radius: 15px;
+            border-radius: 2rem;
+            padding: 1.5rem;
             position: relative;
+            border: 1px solid #4f46e5;
+            box-shadow: 0 30px 40px -20px black;
         }
-        
         .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 30px;
+            position: sticky;
+            top: 0;
+            float: right;
+            font-size: 1.8rem;
+            font-weight: bold;
             cursor: pointer;
-            color: #999;
+            background: #1e293b;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: 0.2s;
         }
-        
         .close-modal:hover {
-            color: #000;
-        }
-        
-        @media (max-width: 768px) {
-            .movies-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            }
-            
-            .movie-poster {
-                height: 225px;
-            }
-        }
-        
-        .stats {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+            background: #ef4444;
             color: white;
+        }
+        .modal-poster {
+            width: 100%;
+            max-height: 320px;
+            object-fit: cover;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        .loading-skeleton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            color: #94a3b8;
+            padding: 3rem;
+        }
+        .footer {
             text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2.2rem; }
+            .movies-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎬 Movie Database</h1>
-            <p>Search and discover movies from 1990 to 2026</p>
-        </div>
-        
-        <div class="search-section">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search movies by title, actor, director...">
-                <button onclick="searchMovies()">🔍 Search</button>
-            </div>
-            
-            <div class="filters">
-                <select id="yearFilter">
-                    <option value="all">All Years</option>
-                </select>
-                
-                <select id="ratingFilter">
-                    <option value="all">All Ratings</option>
-                    <option value="7">7+ ★★★★</option>
-                    <option value="8">8+ ★★★★★</option>
-                    <option value="9">9+ ★★★★★★</option>
-                </select>
-            </div>
-            
-            <div class="year-buttons" id="yearButtons"></div>
-        </div>
-        
-        <div class="stats" id="stats"></div>
-        
-        <div id="moviesGrid" class="movies-grid">
-            <div class="loading">Loading movie database...</div>
-        </div>
-    </div>
-    
-    <!-- Modal for movie details -->
-    <div id="movieModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <div id="modalContent"></div>
-        </div>
+<div class="bg-gradient"></div>
+<div class="stars"></div>
+<div class="container">
+    <div class="hero">
+        <h1><i class="fas fa-film"></i> MovieBase</h1>
+        <p>Powered by TMDB · 1990 → 2026 · Complete archive</p>
     </div>
 
-    <script>
-        let allMovies = [];
-        let currentYear = 'all';
-        
-        async function loadAllMovies() {
+    <div class="glass-card">
+        <div class="search-row">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by title, actor, director or keyword...">
+            </div>
+            <button class="btn-primary" id="searchBtn"><i class="fas fa-arrow-right"></i> Search</button>
+        </div>
+        <div class="filter-group">
+            <select id="yearSelect" class="filter-select"></select>
+            <select id="ratingSelect" class="filter-select">
+                <option value="all">⭐ All ratings</option>
+                <option value="6">6+ ★★</option>
+                <option value="7">7+ ★★★</option>
+                <option value="8">8+ ★★★★</option>
+                <option value="9">9+ ★★★★★</option>
+            </select>
+            <span style="margin-left: auto; font-size: 0.8rem;"><i class="fas fa-database"></i> <span id="movieCountBadge">0</span> films</span>
+        </div>
+        <div class="year-chips" id="yearChips"></div>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+        <span><i class="fas fa-spinner fa-pulse"></i> Loading movie universe...</span>
+    </div>
+
+    <div id="moviesContainer" class="movies-grid">
+        <div class="loading-skeleton"><i class="fas fa-compact-disc fa-spin"></i> Fetching from GitHub Releases...</div>
+    </div>
+    <div class="footer">
+        <i class="fab fa-github"></i> Data refreshed daily via GitHub Actions | API: TMDB
+    </div>
+</div>
+
+<div id="detailModal" class="modal">
+    <div class="modal-card">
+        <div class="close-modal" id="modalCloseBtn">&times;</div>
+        <div id="modalBody">Loading...</div>
+    </div>
+</div>
+
+<script>
+    // ----------------------------------------------
+    // 1. 全域變數
+    // ----------------------------------------------
+    let allMovies = [];            // تمام فیلم‌ها (object کامل)
+    let moviesMap = new Map();     // id -> movie
+    let isLoading = true;
+    let currentRelease = null;
+    const repoName = window.location.pathname.split('/')[1] || 'movie-database';
+
+    // عناصر DOM
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const yearSelect = document.getElementById('yearSelect');
+    const ratingSelect = document.getElementById('ratingSelect');
+    const yearChipsDiv = document.getElementById('yearChips');
+    const moviesContainer = document.getElementById('moviesContainer');
+    const statsBar = document.getElementById('statsBar');
+    const movieCountBadge = document.getElementById('movieCountBadge');
+    const modal = document.getElementById('detailModal');
+    const modalBody = document.getElementById('modalBody');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    // --------------------------------------------------------------
+    // 2.  دریافت آخرین Release (با fallback و error handling)
+    // --------------------------------------------------------------
+    async function fetchReleaseData() {
+        try {
+            const releaseUrl = `https://api.github.com/repos/${repoName}/releases/latest`;
+            const res = await fetch(releaseUrl);
+            if (!res.ok) throw new Error(`GitHub API responded with ${res.status}`);
+            const release = await res.json();
+            if (!release.assets || release.assets.length === 0) throw new Error('No assets found in release');
+            return release;
+        } catch (err) {
+            console.error(err);
+            statsBar.innerHTML = `<span><i class="fas fa-exclamation-triangle"></i> Could not fetch release: ${err.message}. Make sure repository has a release with JSON files.</span>`;
+            return null;
+        }
+    }
+
+    // --------------------------------------------------------------
+    // 3.  بارگذاری تمام فایل‌های movies_YYYY.json
+    // --------------------------------------------------------------
+    async function loadAllMovieFiles(release) {
+        const movieAssets = release.assets.filter(asset => asset.name.match(/^movies_\d{4}\.json$/));
+        if (movieAssets.length === 0) {
+            throw new Error('No movie JSON files found in release (expected movies_1990.json ... movies_2026.json)');
+        }
+        let total = 0;
+        // برای بهبود UX، بارگذاری ترتیبی با نمایش پیشرفت
+        for (let i = 0; i < movieAssets.length; i++) {
+            const asset = movieAssets[i];
+            statsBar.innerHTML = `<span><i class="fas fa-cloud-download-alt"></i> Loading ${asset.name} ... (${i+1}/${movieAssets.length})</span>`;
             try {
-                // اول ایندکس رو می‌گیریم تا بدونیم چند سال داریم
-                const indexRes = await fetch('https://api.github.com/repos/' + window.location.pathname.split('/')[1] + '/releases/latest');
-                const release = await indexRes.json();
-                
-                // بارگذاری فایل‌های JSON از Releases
-                const years = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992, 1991, 1990];
-                
-                for (const year of years) {
-                    try {
-                        const movieFile = release.assets.find(asset => asset.name === `movies_${year}.json`);
-                        if (movieFile) {
-                            const response = await fetch(movieFile.browser_download_url);
-                            const data = await response.json();
-                            if (data.movies && data.movies.length > 0) {
-                                allMovies.push(...data.movies);
-                                console.log(`Loaded ${data.movies.length} movies from ${year}`);
-                            }
+                const resp = await fetch(asset.browser_download_url);
+                if (!resp.ok) continue;
+                const data = await resp.json();
+                if (data.movies && Array.isArray(data.movies)) {
+                    // فیلتر کردن فیلم‌های تکراری بر اساس id (برخی ممکن overlap نداشته باشند ولی ایمنی)
+                    for (const m of data.movies) {
+                        if (!moviesMap.has(m.id)) {
+                            moviesMap.set(m.id, m);
+                            allMovies.push(m);
                         }
-                    } catch (e) {
-                        console.log(`No data for ${year}`);
                     }
+                    total += data.movies.length;
                 }
-                
-                updateStats();
-                displayMovies(allMovies);
-                populateYearFilter();
-                
-            } catch (error) {
-                console.error('Error loading movies:', error);
-                document.getElementById('moviesGrid').innerHTML = '<div class="loading">❌ Error loading database. Please try again later.</div>';
+            } catch (e) {
+                console.warn(`Failed to load ${asset.name}`, e);
             }
         }
+        console.log(`Loaded ${allMovies.length} unique movies (total raw entries: ${total})`);
+        return allMovies;
+    }
+
+    // --------------------------------------------------------------
+    // 4.  رندر اولیه و آپدیت فیلترها
+    // --------------------------------------------------------------
+    function extractUniqueYears() {
+        const yearsSet = new Set();
+        allMovies.forEach(m => {
+            if (m.release_date) {
+                const y = new Date(m.release_date).getFullYear();
+                if (!isNaN(y)) yearsSet.add(y);
+            }
+        });
+        return Array.from(yearsSet).sort((a,b) => b - a);
+    }
+
+    function updateFiltersAndChips() {
+        const years = extractUniqueYears();
+        // پر کردن select
+        yearSelect.innerHTML = '<option value="all">📅 All Years</option>';
+        years.forEach(y => {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+        });
+        // چیپس سال (max 25 تا ولی همه را می‌گذاریم)
+        yearChipsDiv.innerHTML = '';
+        years.slice(0, 30).forEach(y => {
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.textContent = y;
+            chip.dataset.year = y;
+            chip.addEventListener('click', () => {
+                yearSelect.value = y;
+                applyFiltersAndRender();
+                highlightActiveChip(y);
+            });
+            yearChipsDiv.appendChild(chip);
+        });
+        // نمایش تعداد کل
+        movieCountBadge.innerText = allMovies.length.toLocaleString();
+        statsBar.innerHTML = `<span><i class="fas fa-check-circle" style="color:#22c55e"></i> ${allMovies.length.toLocaleString()} movies loaded · ${years.length} years</span>`;
+    }
+
+    function highlightActiveChip(activeYear) {
+        document.querySelectorAll('.chip').forEach(chip => {
+            if (chip.dataset.year == activeYear) chip.classList.add('active');
+            else chip.classList.remove('active');
+        });
+    }
+
+    // ----------------------------------------------
+    // 5.  فیلتر قدرتمند (title, cast, crew, keywords, overview)
+    // ----------------------------------------------
+    function filterMovies() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const selectedYear = yearSelect.value;
+        const minRating = ratingSelect.value === 'all' ? 0 : parseFloat(ratingSelect.value);
         
-        function updateStats() {
-            const uniqueMovies = new Map();
-            allMovies.forEach(m => uniqueMovies.set(m.id, m));
-            const uniqueCount = uniqueMovies.size;
-            
-            const avgRating = (allMovies.reduce((sum, m) => sum + m.vote_average, 0) / allMovies.length).toFixed(1);
-            
-            document.getElementById('stats').innerHTML = `
-                📊 ${uniqueCount.toLocaleString()} movies | ⭐ Average rating: ${avgRating}/10 | 🎬 ${allMovies.length} total entries
-            `;
-        }
+        let filtered = [...allMovies];
         
-        function populateYearFilter() {
-            const years = [...new Set(allMovies.map(m => new Date(m.release_date).getFullYear()).filter(y => y))].sort((a,b) => b-a);
-            const select = document.getElementById('yearFilter');
-            const buttonsDiv = document.getElementById('yearButtons');
-            
-            years.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                select.appendChild(option);
-                
-                const button = document.createElement('button');
-                button.className = 'year-btn';
-                button.textContent = year;
-                button.onclick = () => {
-                    currentYear = year;
-                    document.getElementById('yearFilter').value = year;
-                    filterMovies();
-                };
-                buttonsDiv.appendChild(button);
+        // جستجو در متن کامل و cast/crew
+        if (searchTerm !== '') {
+            filtered = filtered.filter(movie => {
+                // عنوان
+                if (movie.title?.toLowerCase().includes(searchTerm)) return true;
+                // overview
+                if (movie.overview?.toLowerCase().includes(searchTerm)) return true;
+                // cast & crew (credits)
+                if (movie.credits) {
+                    const castMatch = movie.credits.cast?.some(c => c.name?.toLowerCase().includes(searchTerm));
+                    if (castMatch) return true;
+                    const crewMatch = movie.credits.crew?.some(c => c.name?.toLowerCase().includes(searchTerm));
+                    if (crewMatch) return true;
+                }
+                // keywords
+                if (movie.keywords?.keywords) {
+                    const kwMatch = movie.keywords.keywords.some(k => k.name?.toLowerCase().includes(searchTerm));
+                    if (kwMatch) return true;
+                }
+                return false;
             });
         }
         
-        function searchMovies() {
-            filterMovies();
+        // فیلتر سال
+        if (selectedYear !== 'all') {
+            filtered = filtered.filter(movie => {
+                if (!movie.release_date) return false;
+                const year = new Date(movie.release_date).getFullYear();
+                return year == selectedYear;
+            });
         }
         
-        function filterMovies() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const yearValue = document.getElementById('yearFilter').value;
-            const ratingValue = document.getElementById('ratingFilter').value;
-            
-            let filtered = allMovies;
-            
-            if (searchTerm) {
-                filtered = filtered.filter(movie => 
-                    movie.title.toLowerCase().includes(searchTerm) ||
-                    (movie.overview && movie.overview.toLowerCase().includes(searchTerm)) ||
-                    (movie.credits && movie.credits.cast.some(c => c.name.toLowerCase().includes(searchTerm))) ||
-                    (movie.credits && movie.credits.crew.some(c => c.name.toLowerCase().includes(searchTerm)))
-                );
-            }
-            
-            if (yearValue !== 'all') {
-                filtered = filtered.filter(movie => new Date(movie.release_date).getFullYear() == yearValue);
-            }
-            
-            if (ratingValue !== 'all') {
-                filtered = filtered.filter(movie => movie.vote_average >= parseFloat(ratingValue));
-            }
-            
-            displayMovies(filtered);
-            
-            document.getElementById('stats').innerHTML = `
-                🔍 Found ${filtered.length} movies | ⭐ Avg rating: ${(filtered.reduce((sum, m) => sum + m.vote_average, 0) / filtered.length || 0).toFixed(1)}/10
-            `;
+        // فیلتر امتیاز
+        if (minRating > 0) {
+            filtered = filtered.filter(m => m.vote_average >= minRating);
         }
         
-        function displayMovies(movies) {
-            const grid = document.getElementById('moviesGrid');
-            
-            if (movies.length === 0) {
-                grid.innerHTML = '<div class="loading">😢 No movies found. Try different search terms!</div>';
-                return;
-            }
-            
-            grid.innerHTML = movies.slice(0, 100).map(movie => `
-                <div class="movie-card" onclick="showMovieDetails(${movie.id})">
-                    <img class="movie-poster" src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${movie.title}">
+        // مرتب‌سازی بر اساس امتیاز و popularity
+        filtered.sort((a,b) => {
+            if (b.vote_average !== a.vote_average) return b.vote_average - a.vote_average;
+            return (b.popularity || 0) - (a.popularity || 0);
+        });
+        
+        return filtered;
+    }
+    
+    // نمایش فیلم‌ها در گرید (با لیمیت 100 برای نمایش بهینه)
+    function renderMovies(moviesArray) {
+        if (!moviesArray.length) {
+            moviesContainer.innerHTML = `<div class="loading-skeleton"><i class="fas fa-face-sad-tear"></i> No results found. Try another keyword!</div>`;
+            return;
+        }
+        const limited = moviesArray.slice(0, 100); // حداکثر 100 برای سرعت UI
+        moviesContainer.innerHTML = limited.map(movie => {
+            const posterUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : 'https://placehold.co/342x513/1e293b/475569?text=No+Poster';
+            const year = movie.release_date ? new Date(movie.release_date).getFullYear() : '—';
+            return `
+                <div class="movie-card" data-id="${movie.id}">
+                    <img class="poster" src="${posterUrl}" alt="${movie.title}" loading="lazy">
                     <div class="movie-info">
-                        <div class="movie-title">${movie.title}</div>
-                        <div class="movie-year">${movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}</div>
-                        <div class="movie-rating">⭐ ${movie.vote_average}/10</div>
+                        <div class="movie-title">${escapeHtml(movie.title)}</div>
+                        <div class="movie-meta">
+                            <span>${year}</span>
+                            <span class="rating"><i class="fas fa-star" style="color:#fbbf24"></i> ${movie.vote_average?.toFixed(1) || '?'}</span>
+                        </div>
                     </div>
                 </div>
-            `).join('');
-        }
-        
-        function showMovieDetails(movieId) {
-            const movie = allMovies.find(m => m.id === movieId);
-            if (!movie) return;
-            
-            const modalContent = document.getElementById('modalContent');
-            modalContent.innerHTML = `
-                <h2>${movie.title}</h2>
-                ${movie.tagline ? `<p><em>${movie.tagline}</em></p>` : ''}
-                <img src="https://image.tmdb.org/t/p/w500${movie.backdrop_path || movie.poster_path}" style="width:100%; border-radius:10px; margin:15px 0;">
-                <p><strong>⭐ Rating:</strong> ${movie.vote_average}/10 (${movie.vote_count} votes)</p>
-                <p><strong>📅 Release Date:</strong> ${movie.release_date || 'N/A'}</p>
-                <p><strong>⏱️ Runtime:</strong> ${movie.runtime || 'N/A'} minutes</p>
-                <p><strong>🎭 Genres:</strong> ${movie.genres.map(g => g.name).join(', ') || 'N/A'}</p>
-                <p><strong>📖 Overview:</strong> ${movie.overview || 'No overview available.'}</p>
-                
-                ${movie.credits && movie.credits.cast.length > 0 ? `
-                    <h3>Cast</h3>
-                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin:15px 0;">
-                        ${movie.credits.cast.slice(0, 10).map(actor => `
-                            <div style="text-align:center; width:80px;">
-                                <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w185' + actor.profile_path : 'https://via.placeholder.com/80x120?text=No+Image'}" style="width:80px; border-radius:5px;">
-                                <div style="font-size:12px; margin-top:5px;">${actor.name}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                ` : ''}
-                
-                ${movie.keywords && movie.keywords.keywords.length > 0 ? `
-                    <h3>Keywords</h3>
-                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin:15px 0;">
-                        ${movie.keywords.keywords.slice(0, 15).map(k => `<span style="background:#f0f0f0; padding:5px 12px; border-radius:20px; font-size:12px;">${k.name}</span>`).join('')}
-                    </div>
-                ` : ''}
-                
-                ${movie.recommendations && movie.recommendations.results.length > 0 ? `
-                    <h3>Recommendations</h3>
-                    <div style="display:flex; overflow-x:auto; gap:15px; margin:15px 0;">
-                        ${movie.recommendations.results.slice(0, 10).map(rec => `
-                            <div style="min-width:120px; text-align:center; cursor:pointer;" onclick="showMovieDetails(${rec.id})">
-                                <img src="https://image.tmdb.org/t/p/w185${rec.poster_path}" style="width:120px; border-radius:8px;">
-                                <div style="font-size:12px; margin-top:5px;">${rec.title}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                ` : ''}
             `;
-            
-            document.getElementById('movieModal').style.display = 'block';
-        }
+        }).join('');
         
-        function closeModal() {
-            document.getElementById('movieModal').style.display = 'none';
-        }
+        // attach event listeners
+        document.querySelectorAll('.movie-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const id = parseInt(card.dataset.id);
+                const movie = allMovies.find(m => m.id === id);
+                if (movie) showMovieModal(movie);
+            });
+        });
+    }
+    
+    // توابع کمکی
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
+    
+    function applyFiltersAndRender() {
+        const filtered = filterMovies();
+        renderMovies(filtered);
+        // آمار جدید
+        statsBar.innerHTML = `<span><i class="fas fa-filter"></i> Showing ${filtered.length} movies out of ${allMovies.length}</span>`;
+    }
+    
+    // مودال حرفه‌ای با جزئیات کامل
+    function showMovieModal(movie) {
+        const backdrop = movie.backdrop_path ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}` : (movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : '');
+        const genres = movie.genres?.map(g => g.name).join(', ') || '—';
+        const runtime = movie.runtime ? `${movie.runtime} min` : '—';
+        const releaseDate = movie.release_date || 'Unknown';
+        const voteAverage = movie.vote_average?.toFixed(1) || '—';
+        const overview = movie.overview || 'No synopsis available.';
+        const castList = movie.credits?.cast?.slice(0, 8).map(actor => `<div style="text-align:center; width:70px;"><img style="width:60px;height:60px;object-fit:cover;border-radius:50%;" src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w185'+actor.profile_path : 'https://via.placeholder.com/60?text=?'}" loading="lazy"><div style="font-size:11px;margin-top:4px;">${escapeHtml(actor.name)}</div></div>`).join('') || '<span>—</span>';
         
-        window.onclick = function(event) {
-            const modal = document.getElementById('movieModal');
-            if (event.target === modal) {
-                closeModal();
+        modalBody.innerHTML = `
+            <h2 style="font-size:1.8rem; margin-bottom:0.2rem;">${escapeHtml(movie.title)}</h2>
+            ${movie.tagline ? `<p style="color:#a5b4fc; margin-bottom:1rem;"><i>${escapeHtml(movie.tagline)}</i></p>` : ''}
+            ${backdrop ? `<img class="modal-poster" src="${backdrop}" alt="${movie.title}">` : ''}
+            <div style="display:flex; flex-wrap:wrap; gap:1rem; margin:1rem 0;">
+                <span><i class="fas fa-star" style="color:#fbbf24"></i> ${voteAverage}/10 (${movie.vote_count} votes)</span>
+                <span><i class="fas fa-calendar-alt"></i> ${releaseDate}</span>
+                <span><i class="fas fa-clock"></i> ${runtime}</span>
+                <span><i class="fas fa-tags"></i> ${genres}</span>
+            </div>
+            <p><strong>📖 Overview</strong><br>${escapeHtml(overview)}</p>
+            <hr style="border-color:#334155; margin:1rem 0;">
+            <h3><i class="fas fa-users"></i> Top Cast</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:1rem; margin:1rem 0;">${castList}</div>
+            ${movie.keywords?.keywords?.length ? `<div><strong>🔑 Keywords:</strong> ${movie.keywords.keywords.slice(0,12).map(k=>`<span style="background:#1e293b; padding:0.2rem 0.8rem; border-radius:30px; font-size:0.7rem; margin:0.2rem; display:inline-block;">${escapeHtml(k.name)}</span>`).join('')}</div>` : ''}
+            ${movie.recommendations?.results?.length ? `<div style="margin-top:1rem;"><strong>🎥 You may also like</strong><div style="display:flex; overflow-x:auto; gap:1rem; margin-top:0.8rem;">${movie.recommendations.results.slice(0,6).map(rec=>`<div style="min-width:100px;text-align:center;cursor:pointer;" onclick='window.location.reload(); showMovieDetailsById(${rec.id})? location.href="#":null'><img src="https://image.tmdb.org/t/p/w154${rec.poster_path}" style="width:90px;border-radius:12px;"><div style="font-size:0.7rem;">${escapeHtml(rec.title)}</div></div>`).join('')}</div></div>` : ''}
+        `;
+        // رفرش ایونت برای رکومندیشن: ساده، اگر روی rec کلیک کرد دوباره مودال را باز می‌کنیم
+        window.showMovieDetailsById = (id) => {
+            const found = allMovies.find(m => m.id === id);
+            if(found) showMovieModal(found);
+            else console.warn('rec not found');
+        };
+        modal.style.display = 'flex';
+    }
+    
+    // رویدادهای سرچ
+    function performSearch() {
+        applyFiltersAndRender();
+    }
+    
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(); });
+    yearSelect.addEventListener('change', () => {
+        applyFiltersAndRender();
+        const yearVal = yearSelect.value;
+        if(yearVal !== 'all') highlightActiveChip(yearVal);
+        else document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
+    });
+    ratingSelect.addEventListener('change', applyFiltersAndRender);
+    
+    modalCloseBtn.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if(e.target === modal) modal.style.display = 'none'; });
+    
+    // --------------------------------------------------------------
+    // 6.  بوت استرپ اصلی
+    // --------------------------------------------------------------
+    async function init() {
+        try {
+            const release = await fetchReleaseData();
+            if (!release) {
+                moviesContainer.innerHTML = '<div class="loading-skeleton"><i class="fas fa-exclamation-triangle"></i> No GitHub Release found. Please run the GitHub Action first.</div>';
+                return;
             }
+            currentRelease = release;
+            await loadAllMovieFiles(release);
+            if(allMovies.length === 0) throw new Error('No movies loaded from JSON files');
+            updateFiltersAndChips();
+            renderMovies(filterMovies());
+            statsBar.innerHTML = `<span><i class="fas fa-check-circle"></i> Ready · ${allMovies.length.toLocaleString()} movies · ${extractUniqueYears().length} years</span>`;
+        } catch (err) {
+            console.error(err);
+            moviesContainer.innerHTML = `<div class="loading-skeleton"><i class="fas fa-bug"></i> Error: ${err.message}. Check release assets or network.</div>`;
+            statsBar.innerHTML = `<span><i class="fas fa-times-circle"></i> Initialization failed. ${err.message}</span>`;
+        } finally {
+            isLoading = false;
         }
-        
-        // بارگذاری دیتابیس
-        loadAllMovies();
-    </script>
+    }
+    
+    init();
+</script>
 </body>
 </html>
