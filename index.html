@@ -3,680 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieBase 🎬 | Ultimate Movie Discovery</title>
-    <!-- Font Awesome 6 (free) -->
+    <title>MovieBase | Complete Movie Archive</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0e1a;
-            color: #eef5ff;
-        }
-
-        /* custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1e2a3a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4f46e5;
-            border-radius: 10px;
-        }
-
-        .bg-gradient {
-            background: radial-gradient(circle at 20% 30%, #0f172a, #030614);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-        }
-
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)), 
-                              radial-gradient(1px 1px at 60px 80px, #f8fafc, rgba(0,0,0,0));
-            background-size: 200px 200px, 150px 150px;
-            background-repeat: repeat;
-            opacity: 0.2;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 1.5rem;
-        }
-
-        /* header */
-        .hero {
-            text-align: center;
-            margin: 2rem 0 2rem 0;
-        }
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #c084fc, #60a5fa, #f472b6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.02em;
-        }
-        .hero p {
-            color: #94a3b8;
-            margin-top: 0.5rem;
-        }
-
-        /* search card */
-        .glass-card {
-            background: rgba(15, 25, 45, 0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(79, 70, 229, 0.3);
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
-            transition: all 0.2s;
-        }
-
-        .search-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .search-wrapper {
-            flex: 2;
-            position: relative;
-        }
-        .search-wrapper i {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-            font-size: 1.2rem;
-        }
-        #searchInput {
-            width: 100%;
-            padding: 1rem 1rem 1rem 3rem;
-            font-size: 1rem;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 2rem;
-            color: white;
-            transition: 0.2s;
-        }
-        #searchInput:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
-        }
-        .btn-primary {
-            background: linear-gradient(105deg, #4f46e5, #7c3aed);
-            border: none;
-            padding: 0 2rem;
-            border-radius: 2rem;
-            font-weight: 600;
-            color: white;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1rem;
-        }
-        .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 20px -5px #4f46e5;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .filter-select {
-            background: #0f172a;
-            border: 1px solid #334155;
-            padding: 0.6rem 1.2rem;
-            border-radius: 2rem;
-            color: white;
-            cursor: pointer;
-        }
-        .year-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-        .chip {
-            background: #1e293b;
-            padding: 0.4rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #cbd5e1;
-        }
-        .chip.active, .chip:hover {
-            background: #4f46e5;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* stats bar */
-        .stats-bar {
-            background: #0f172a80;
-            backdrop-filter: blur(4px);
-            border-radius: 2rem;
-            padding: 0.8rem 1.5rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-            font-size: 0.9rem;
-            border: 1px solid #2d3a5e;
-        }
-
-        /* movie grid */
-        .movies-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-            gap: 1.8rem;
-        }
-        .movie-card {
-            background: #111827cc;
-            backdrop-filter: blur(4px);
-            border-radius: 1.5rem;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            cursor: pointer;
-            border: 1px solid #2d3748;
-        }
-        .movie-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 35px -12px black;
-            border-color: #7c3aed;
-        }
-        .poster {
-            width: 100%;
-            aspect-ratio: 2 / 3;
-            object-fit: cover;
-            background: #0f172a;
-        }
-        .movie-info {
-            padding: 1rem;
-        }
-        .movie-title {
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 0.3rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .movie-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #9ca3af;
-            margin-top: 0.5rem;
-        }
-        .rating {
-            color: #fbbf24;
-            font-weight: 600;
-        }
-
-        /* modal premium */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-card {
-            background: #0f172a;
-            max-width: 820px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            border-radius: 2rem;
-            padding: 1.5rem;
-            position: relative;
-            border: 1px solid #4f46e5;
-            box-shadow: 0 30px 40px -20px black;
-        }
-        .close-modal {
-            position: sticky;
-            top: 0;
-            float: right;
-            font-size: 1.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            background: #1e293b;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: 0.2s;
-        }
-        .close-modal:hover {
-            background: #ef4444;
-            color: white;
-        }
-        .modal-poster {
-            width: 100%;
-            max-height: 320px;
-            object-fit: cover;
-            border-radius: 1rem;
-            margin: 1rem 0;
-        }
-
-        .loading-skeleton {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1rem;
-            color: #94a3b8;
-            padding: 3rem;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding: 1rem;
-            font-size: 0.8rem;
-            color: #475569;
-        }
-        @media (max-width: 640px) {
-            .hero h1 { font-size: 2.2rem; }
-            .movies-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',system-ui,background:#0a0e1a;color:#eef5ff}
+        .bg-gradient{position:fixed;inset:0;background:radial-gradient(circle at 20% 30%,#0f172a,#030614);z-index:-2}
+        .stars{position:fixed;inset:0;background-image:radial-gradient(2px 2px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 60px 80px,#f8fafc,transparent);background-size:200px 200px,150px 150px;opacity:.2;pointer-events:none;z-index:-1}
+        .container{max-width:1440px;margin:0 auto;padding:1.5rem}
+        .hero{text-align:center;margin:2rem 0}
+        .hero h1{font-size:3.5rem;font-weight:800;background:linear-gradient(135deg,#c084fc,#60a5fa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+        .glass-card{background:rgba(15,25,45,.7);backdrop-filter:blur(12px);border-radius:2rem;padding:1.8rem;margin-bottom:2rem;border:1px solid rgba(79,70,229,.3)}
+        .search-row{display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem}
+        .search-wrapper{flex:2;position:relative}
+        .search-wrapper i{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#6b7280}
+        #searchInput{width:100%;padding:1rem 1rem 1rem 3rem;background:#0f172a;border:1px solid #334155;border-radius:2rem;color:white;font-size:1rem}
+        .btn-primary{background:linear-gradient(105deg,#4f46e5,#7c3aed);border:none;padding:0 2rem;border-radius:2rem;font-weight:600;color:white;cursor:pointer;display:flex;align-items:center;gap:8px}
+        .filter-group{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1rem}
+        .filter-select{background:#0f172a;border:1px solid #334155;padding:.6rem 1.2rem;border-radius:2rem;color:white}
+        .year-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+        .chip{background:#1e293b;padding:.4rem 1rem;border-radius:30px;font-size:.8rem;cursor:pointer;color:#cbd5e1}
+        .chip.active,.chip:hover{background:#4f46e5;color:white}
+        .stats-bar{background:#0f172a80;border-radius:2rem;padding:.8rem 1.5rem;margin-bottom:2rem;display:flex;justify-content:space-between;flex-wrap:wrap}
+        .movies-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.8rem}
+        .movie-card{background:#111827cc;border-radius:1.5rem;overflow:hidden;cursor:pointer;border:1px solid #2d3748;transition:.3s}
+        .movie-card:hover{transform:translateY(-8px);border-color:#7c3aed}
+        .poster{width:100%;aspect-ratio:2/3;object-fit:cover}
+        .movie-info{padding:1rem}
+        .movie-title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .movie-meta{display:flex;justify-content:space-between;font-size:.75rem;color:#9ca3af;margin-top:.5rem}
+        .rating{color:#fbbf24}
+        .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:2000;align-items:center;justify-content:center}
+        .modal-card{background:#0f172a;max-width:820px;width:90%;max-height:85vh;overflow-y:auto;border-radius:2rem;padding:1.5rem;border:1px solid #4f46e5}
+        .close-modal{float:right;font-size:1.8rem;cursor:pointer;background:#1e293b;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+        .close-modal:hover{background:#ef4444;color:white}
+        .modal-poster{width:100%;max-height:300px;object-fit:cover;border-radius:1rem;margin:1rem 0}
+        .loading-skeleton{display:flex;justify-content:center;align-items:center;gap:1rem;color:#94a3b8;padding:3rem}
+        .footer{text-align:center;margin-top:3rem;font-size:.8rem;color:#475569}
+        @media (max-width:640px){.hero h1{font-size:2.2rem}.movies-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
     </style>
 </head>
 <body>
 <div class="bg-gradient"></div>
 <div class="stars"></div>
 <div class="container">
-    <div class="hero">
-        <h1><i class="fas fa-film"></i> MovieBase</h1>
-        <p>Powered by TMDB · 1990 → 2026 · Complete archive</p>
-    </div>
-
+    <div class="hero"><h1><i class="fas fa-film"></i> MovieBase</h1><p>Powered by TMDB · 1990–2026 Complete Archive</p></div>
     <div class="glass-card">
         <div class="search-row">
-            <div class="search-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search by title, actor, director or keyword...">
-            </div>
+            <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search by title, actor, director..."></div>
             <button class="btn-primary" id="searchBtn"><i class="fas fa-arrow-right"></i> Search</button>
         </div>
         <div class="filter-group">
             <select id="yearSelect" class="filter-select"></select>
-            <select id="ratingSelect" class="filter-select">
-                <option value="all">⭐ All ratings</option>
-                <option value="6">6+ ★★</option>
-                <option value="7">7+ ★★★</option>
-                <option value="8">8+ ★★★★</option>
-                <option value="9">9+ ★★★★★</option>
-            </select>
-            <span style="margin-left: auto; font-size: 0.8rem;"><i class="fas fa-database"></i> <span id="movieCountBadge">0</span> films</span>
+            <select id="ratingSelect" class="filter-select"><option value="all">⭐ All ratings</option><option value="6">6+</option><option value="7">7+</option><option value="8">8+</option><option value="9">9+</option></select>
+            <span style="margin-left:auto"><i class="fas fa-database"></i> <span id="movieCountBadge">0</span> films</span>
         </div>
         <div class="year-chips" id="yearChips"></div>
     </div>
-
-    <div class="stats-bar" id="statsBar">
-        <span><i class="fas fa-spinner fa-pulse"></i> Loading movie universe...</span>
-    </div>
-
-    <div id="moviesContainer" class="movies-grid">
-        <div class="loading-skeleton"><i class="fas fa-compact-disc fa-spin"></i> Fetching from GitHub Releases...</div>
-    </div>
-    <div class="footer">
-        <i class="fab fa-github"></i> Data refreshed daily via GitHub Actions | API: TMDB
-    </div>
+    <div class="stats-bar" id="statsBar"><span><i class="fas fa-spinner fa-pulse"></i> Initializing...</span></div>
+    <div id="moviesContainer" class="movies-grid"><div class="loading-skeleton"><i class="fas fa-compact-disc fa-spin"></i> Loading movies from GitHub...</div></div>
+    <div class="footer"><i class="fab fa-github"></i> Data from GitHub Releases | TMDB</div>
 </div>
-
-<div id="detailModal" class="modal">
-    <div class="modal-card">
-        <div class="close-modal" id="modalCloseBtn">&times;</div>
-        <div id="modalBody">Loading...</div>
-    </div>
-</div>
+<div id="detailModal" class="modal"><div class="modal-card"><div class="close-modal" id="modalCloseBtn">&times;</div><div id="modalBody"></div></div></div>
 
 <script>
-    // ----------------------------------------------
-    // 1. 全域變數
-    // ----------------------------------------------
-    let allMovies = [];            // تمام فیلم‌ها (object کامل)
-    let moviesMap = new Map();     // id -> movie
-    let isLoading = true;
-    let currentRelease = null;
-    const repoName = window.location.pathname.split('/')[1] || 'movie-database';
-
-    // عناصر DOM
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    const yearSelect = document.getElementById('yearSelect');
-    const ratingSelect = document.getElementById('ratingSelect');
-    const yearChipsDiv = document.getElementById('yearChips');
-    const moviesContainer = document.getElementById('moviesContainer');
-    const statsBar = document.getElementById('statsBar');
-    const movieCountBadge = document.getElementById('movieCountBadge');
-    const modal = document.getElementById('detailModal');
-    const modalBody = document.getElementById('modalBody');
-    const modalCloseBtn = document.getElementById('modalCloseBtn');
-
-    // --------------------------------------------------------------
-    // 2.  دریافت آخرین Release (با fallback و error handling)
-    // --------------------------------------------------------------
-    async function fetchReleaseData() {
+    // ============================================================
+    // 🔴 فقط این خط را به نام مخزن خود تغییر دهید 🔴
+    const REPO_NAME = 'movie-database';   // ← اینجا نام مخزن خود را بنویس
+    // ============================================================
+    const TAG = 'v1.0.0';
+    
+    function getJsonUrl(year) {
+        return `https://raw.githubusercontent.com/${REPO_NAME}/${TAG}/data/movies_${year}.json`;
+    }
+    
+    let allMovies = [];
+    let moviesMap = new Map();
+    
+    async function loadYear(year) {
         try {
-            const releaseUrl = `https://api.github.com/repos/${repoName}/releases/latest`;
-            const res = await fetch(releaseUrl);
-            if (!res.ok) throw new Error(`GitHub API responded with ${res.status}`);
-            const release = await res.json();
-            if (!release.assets || release.assets.length === 0) throw new Error('No assets found in release');
-            return release;
-        } catch (err) {
-            console.error(err);
-            statsBar.innerHTML = `<span><i class="fas fa-exclamation-triangle"></i> Could not fetch release: ${err.message}. Make sure repository has a release with JSON files.</span>`;
-            return null;
-        }
-    }
-
-    // --------------------------------------------------------------
-    // 3.  بارگذاری تمام فایل‌های movies_YYYY.json
-    // --------------------------------------------------------------
-    async function loadAllMovieFiles(release) {
-        const movieAssets = release.assets.filter(asset => asset.name.match(/^movies_\d{4}\.json$/));
-        if (movieAssets.length === 0) {
-            throw new Error('No movie JSON files found in release (expected movies_1990.json ... movies_2026.json)');
-        }
-        let total = 0;
-        // برای بهبود UX، بارگذاری ترتیبی با نمایش پیشرفت
-        for (let i = 0; i < movieAssets.length; i++) {
-            const asset = movieAssets[i];
-            statsBar.innerHTML = `<span><i class="fas fa-cloud-download-alt"></i> Loading ${asset.name} ... (${i+1}/${movieAssets.length})</span>`;
-            try {
-                const resp = await fetch(asset.browser_download_url);
-                if (!resp.ok) continue;
-                const data = await resp.json();
-                if (data.movies && Array.isArray(data.movies)) {
-                    // فیلتر کردن فیلم‌های تکراری بر اساس id (برخی ممکن overlap نداشته باشند ولی ایمنی)
-                    for (const m of data.movies) {
-                        if (!moviesMap.has(m.id)) {
-                            moviesMap.set(m.id, m);
-                            allMovies.push(m);
-                        }
+            const resp = await fetch(getJsonUrl(year));
+            if (!resp.ok) return 0;
+            const data = await resp.json();
+            if (data && data.movies) {
+                let added = 0;
+                for (const m of data.movies) {
+                    if (!moviesMap.has(m.id)) {
+                        moviesMap.set(m.id, m);
+                        allMovies.push(m);
+                        added++;
                     }
-                    total += data.movies.length;
                 }
-            } catch (e) {
-                console.warn(`Failed to load ${asset.name}`, e);
+                return added;
             }
+            return 0;
+        } catch(e) {
+            console.warn(`Year ${year} failed`, e);
+            return 0;
         }
-        console.log(`Loaded ${allMovies.length} unique movies (total raw entries: ${total})`);
-        return allMovies;
     }
-
-    // --------------------------------------------------------------
-    // 4.  رندر اولیه و آپدیت فیلترها
-    // --------------------------------------------------------------
-    function extractUniqueYears() {
-        const yearsSet = new Set();
+    
+    async function loadAll() {
+        const years = [];
+        for (let y = 1990; y <= 2026; y++) years.push(y);
+        let total = 0;
+        const stats = document.getElementById('statsBar');
+        for (let i = 0; i < years.length; i++) {
+            const y = years[i];
+            stats.innerHTML = `<span><i class="fas fa-cloud-download-alt"></i> Loading ${y}... (${i+1}/${years.length})</span>`;
+            const count = await loadYear(y);
+            if (count > 0) total += count;
+            await new Promise(r => setTimeout(r, 30));
+        }
+        return total;
+    }
+    
+    function extractYears() {
+        const set = new Set();
         allMovies.forEach(m => {
             if (m.release_date) {
-                const y = new Date(m.release_date).getFullYear();
-                if (!isNaN(y)) yearsSet.add(y);
+                const yr = new Date(m.release_date).getFullYear();
+                if (!isNaN(yr)) set.add(yr);
             }
         });
-        return Array.from(yearsSet).sort((a,b) => b - a);
+        return Array.from(set).sort((a,b) => b - a);
     }
-
-    function updateFiltersAndChips() {
-        const years = extractUniqueYears();
-        // پر کردن select
-        yearSelect.innerHTML = '<option value="all">📅 All Years</option>';
+    
+    function populateUI() {
+        const years = extractYears();
+        const yearSelect = document.getElementById('yearSelect');
+        yearSelect.innerHTML = '<option value="all">All Years</option>';
         years.forEach(y => {
             const opt = document.createElement('option');
             opt.value = y;
             opt.textContent = y;
             yearSelect.appendChild(opt);
         });
-        // چیپس سال (max 25 تا ولی همه را می‌گذاریم)
-        yearChipsDiv.innerHTML = '';
-        years.slice(0, 30).forEach(y => {
+        const chipsDiv = document.getElementById('yearChips');
+        chipsDiv.innerHTML = '';
+        years.slice(0,30).forEach(y => {
             const chip = document.createElement('div');
             chip.className = 'chip';
             chip.textContent = y;
-            chip.dataset.year = y;
-            chip.addEventListener('click', () => {
+            chip.onclick = () => {
                 yearSelect.value = y;
-                applyFiltersAndRender();
-                highlightActiveChip(y);
-            });
-            yearChipsDiv.appendChild(chip);
+                applyFilters();
+                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            };
+            chipsDiv.appendChild(chip);
         });
-        // نمایش تعداد کل
-        movieCountBadge.innerText = allMovies.length.toLocaleString();
-        statsBar.innerHTML = `<span><i class="fas fa-check-circle" style="color:#22c55e"></i> ${allMovies.length.toLocaleString()} movies loaded · ${years.length} years</span>`;
+        document.getElementById('movieCountBadge').innerText = allMovies.length.toLocaleString();
     }
-
-    function highlightActiveChip(activeYear) {
-        document.querySelectorAll('.chip').forEach(chip => {
-            if (chip.dataset.year == activeYear) chip.classList.add('active');
-            else chip.classList.remove('active');
-        });
-    }
-
-    // ----------------------------------------------
-    // 5.  فیلتر قدرتمند (title, cast, crew, keywords, overview)
-    // ----------------------------------------------
-    function filterMovies() {
-        const searchTerm = searchInput.value.trim().toLowerCase();
-        const selectedYear = yearSelect.value;
-        const minRating = ratingSelect.value === 'all' ? 0 : parseFloat(ratingSelect.value);
-        
+    
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
+    
+    function getFiltered() {
         let filtered = [...allMovies];
+        const term = document.getElementById('searchInput').value.trim().toLowerCase();
+        const year = document.getElementById('yearSelect').value;
+        const minRating = document.getElementById('ratingSelect').value === 'all' ? 0 : parseFloat(document.getElementById('ratingSelect').value);
         
-        // جستجو در متن کامل و cast/crew
-        if (searchTerm !== '') {
-            filtered = filtered.filter(movie => {
-                // عنوان
-                if (movie.title?.toLowerCase().includes(searchTerm)) return true;
-                // overview
-                if (movie.overview?.toLowerCase().includes(searchTerm)) return true;
-                // cast & crew (credits)
-                if (movie.credits) {
-                    const castMatch = movie.credits.cast?.some(c => c.name?.toLowerCase().includes(searchTerm));
-                    if (castMatch) return true;
-                    const crewMatch = movie.credits.crew?.some(c => c.name?.toLowerCase().includes(searchTerm));
-                    if (crewMatch) return true;
-                }
-                // keywords
-                if (movie.keywords?.keywords) {
-                    const kwMatch = movie.keywords.keywords.some(k => k.name?.toLowerCase().includes(searchTerm));
-                    if (kwMatch) return true;
-                }
-                return false;
-            });
+        if (term) {
+            filtered = filtered.filter(m => 
+                m.title?.toLowerCase().includes(term) ||
+                m.overview?.toLowerCase().includes(term) ||
+                m.credits?.cast?.some(c => c.name?.toLowerCase().includes(term)) ||
+                m.credits?.crew?.some(c => c.name?.toLowerCase().includes(term))
+            );
         }
-        
-        // فیلتر سال
-        if (selectedYear !== 'all') {
-            filtered = filtered.filter(movie => {
-                if (!movie.release_date) return false;
-                const year = new Date(movie.release_date).getFullYear();
-                return year == selectedYear;
-            });
+        if (year !== 'all') {
+            filtered = filtered.filter(m => m.release_date && new Date(m.release_date).getFullYear() == year);
         }
-        
-        // فیلتر امتیاز
         if (minRating > 0) {
             filtered = filtered.filter(m => m.vote_average >= minRating);
         }
-        
-        // مرتب‌سازی بر اساس امتیاز و popularity
-        filtered.sort((a,b) => {
-            if (b.vote_average !== a.vote_average) return b.vote_average - a.vote_average;
-            return (b.popularity || 0) - (a.popularity || 0);
-        });
-        
+        filtered.sort((a,b) => (b.vote_average||0) - (a.vote_average||0));
         return filtered;
     }
     
-    // نمایش فیلم‌ها در گرید (با لیمیت 100 برای نمایش بهینه)
-    function renderMovies(moviesArray) {
-        if (!moviesArray.length) {
-            moviesContainer.innerHTML = `<div class="loading-skeleton"><i class="fas fa-face-sad-tear"></i> No results found. Try another keyword!</div>`;
+    function renderMovies(movies) {
+        const container = document.getElementById('moviesContainer');
+        if (!movies.length) {
+            container.innerHTML = '<div class="loading-skeleton">😢 No results found.</div>';
             return;
         }
-        const limited = moviesArray.slice(0, 100); // حداکثر 100 برای سرعت UI
-        moviesContainer.innerHTML = limited.map(movie => {
-            const posterUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : 'https://placehold.co/342x513/1e293b/475569?text=No+Poster';
-            const year = movie.release_date ? new Date(movie.release_date).getFullYear() : '—';
-            return `
-                <div class="movie-card" data-id="${movie.id}">
-                    <img class="poster" src="${posterUrl}" alt="${movie.title}" loading="lazy">
-                    <div class="movie-info">
-                        <div class="movie-title">${escapeHtml(movie.title)}</div>
-                        <div class="movie-meta">
-                            <span>${year}</span>
-                            <span class="rating"><i class="fas fa-star" style="color:#fbbf24"></i> ${movie.vote_average?.toFixed(1) || '?'}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+        container.innerHTML = movies.slice(0,100).map(m => {
+            const poster = m.poster_path ? `https://image.tmdb.org/t/p/w342${m.poster_path}` : 'https://placehold.co/342x513/1e293b/475569?text=No+Poster';
+            const year = m.release_date ? new Date(m.release_date).getFullYear() : '—';
+            return `<div class="movie-card" data-id="${m.id}"><img class="poster" src="${poster}" loading="lazy"><div class="movie-info"><div class="movie-title">${escapeHtml(m.title)}</div><div class="movie-meta"><span>${year}</span><span class="rating"><i class="fas fa-star"></i> ${m.vote_average?.toFixed(1)||'?'}</span></div></div></div>`;
         }).join('');
-        
-        // attach event listeners
         document.querySelectorAll('.movie-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                const id = parseInt(card.dataset.id);
-                const movie = allMovies.find(m => m.id === id);
-                if (movie) showMovieModal(movie);
+            card.addEventListener('click', () => {
+                const movie = allMovies.find(m => m.id == card.dataset.id);
+                if (movie) showModal(movie);
             });
         });
     }
     
-    // توابع کمکی
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
-    
-    function applyFiltersAndRender() {
-        const filtered = filterMovies();
-        renderMovies(filtered);
-        // آمار جدید
-        statsBar.innerHTML = `<span><i class="fas fa-filter"></i> Showing ${filtered.length} movies out of ${allMovies.length}</span>`;
-    }
-    
-    // مودال حرفه‌ای با جزئیات کامل
-    function showMovieModal(movie) {
+    function showModal(movie) {
+        const modalBody = document.getElementById('modalBody');
         const backdrop = movie.backdrop_path ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}` : (movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : '');
-        const genres = movie.genres?.map(g => g.name).join(', ') || '—';
-        const runtime = movie.runtime ? `${movie.runtime} min` : '—';
-        const releaseDate = movie.release_date || 'Unknown';
-        const voteAverage = movie.vote_average?.toFixed(1) || '—';
-        const overview = movie.overview || 'No synopsis available.';
-        const castList = movie.credits?.cast?.slice(0, 8).map(actor => `<div style="text-align:center; width:70px;"><img style="width:60px;height:60px;object-fit:cover;border-radius:50%;" src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w185'+actor.profile_path : 'https://via.placeholder.com/60?text=?'}" loading="lazy"><div style="font-size:11px;margin-top:4px;">${escapeHtml(actor.name)}</div></div>`).join('') || '<span>—</span>';
-        
         modalBody.innerHTML = `
-            <h2 style="font-size:1.8rem; margin-bottom:0.2rem;">${escapeHtml(movie.title)}</h2>
-            ${movie.tagline ? `<p style="color:#a5b4fc; margin-bottom:1rem;"><i>${escapeHtml(movie.tagline)}</i></p>` : ''}
-            ${backdrop ? `<img class="modal-poster" src="${backdrop}" alt="${movie.title}">` : ''}
-            <div style="display:flex; flex-wrap:wrap; gap:1rem; margin:1rem 0;">
-                <span><i class="fas fa-star" style="color:#fbbf24"></i> ${voteAverage}/10 (${movie.vote_count} votes)</span>
-                <span><i class="fas fa-calendar-alt"></i> ${releaseDate}</span>
-                <span><i class="fas fa-clock"></i> ${runtime}</span>
-                <span><i class="fas fa-tags"></i> ${genres}</span>
-            </div>
-            <p><strong>📖 Overview</strong><br>${escapeHtml(overview)}</p>
-            <hr style="border-color:#334155; margin:1rem 0;">
-            <h3><i class="fas fa-users"></i> Top Cast</h3>
-            <div style="display:flex; flex-wrap:wrap; gap:1rem; margin:1rem 0;">${castList}</div>
-            ${movie.keywords?.keywords?.length ? `<div><strong>🔑 Keywords:</strong> ${movie.keywords.keywords.slice(0,12).map(k=>`<span style="background:#1e293b; padding:0.2rem 0.8rem; border-radius:30px; font-size:0.7rem; margin:0.2rem; display:inline-block;">${escapeHtml(k.name)}</span>`).join('')}</div>` : ''}
-            ${movie.recommendations?.results?.length ? `<div style="margin-top:1rem;"><strong>🎥 You may also like</strong><div style="display:flex; overflow-x:auto; gap:1rem; margin-top:0.8rem;">${movie.recommendations.results.slice(0,6).map(rec=>`<div style="min-width:100px;text-align:center;cursor:pointer;" onclick='window.location.reload(); showMovieDetailsById(${rec.id})? location.href="#":null'><img src="https://image.tmdb.org/t/p/w154${rec.poster_path}" style="width:90px;border-radius:12px;"><div style="font-size:0.7rem;">${escapeHtml(rec.title)}</div></div>`).join('')}</div></div>` : ''}
+            <h2>${escapeHtml(movie.title)}</h2>
+            ${backdrop ? `<img class="modal-poster" src="${backdrop}">` : ''}
+            <p><strong>⭐ ${movie.vote_average?.toFixed(1)}/10</strong> (${movie.vote_count} votes)</p>
+            <p>📅 ${movie.release_date || 'N/A'} | ⏱️ ${movie.runtime || '?'} min</p>
+            <p>🎭 Genres: ${movie.genres?.map(g=>g.name).join(', ')||'—'}</p>
+            <p>📖 ${escapeHtml(movie.overview || 'No overview')}</p>
         `;
-        // رفرش ایونت برای رکومندیشن: ساده، اگر روی rec کلیک کرد دوباره مودال را باز می‌کنیم
-        window.showMovieDetailsById = (id) => {
-            const found = allMovies.find(m => m.id === id);
-            if(found) showMovieModal(found);
-            else console.warn('rec not found');
-        };
-        modal.style.display = 'flex';
+        document.getElementById('detailModal').style.display = 'flex';
     }
     
-    // رویدادهای سرچ
-    function performSearch() {
-        applyFiltersAndRender();
+    function applyFilters() {
+        const filtered = getFiltered();
+        renderMovies(filtered);
+        document.getElementById('statsBar').innerHTML = `<span><i class="fas fa-filter"></i> Showing ${filtered.length} of ${allMovies.length} movies</span>`;
     }
     
-    searchBtn.addEventListener('click', performSearch);
-    searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(); });
-    yearSelect.addEventListener('change', () => {
-        applyFiltersAndRender();
-        const yearVal = yearSelect.value;
-        if(yearVal !== 'all') highlightActiveChip(yearVal);
-        else document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
-    });
-    ratingSelect.addEventListener('change', applyFiltersAndRender);
+    document.getElementById('searchBtn').onclick = applyFilters;
+    document.getElementById('searchInput').onkeypress = e => { if(e.key === 'Enter') applyFilters(); };
+    document.getElementById('yearSelect').onchange = applyFilters;
+    document.getElementById('ratingSelect').onchange = applyFilters;
+    document.getElementById('modalCloseBtn').onclick = () => document.getElementById('detailModal').style.display = 'none';
+    window.onclick = e => { if(e.target === document.getElementById('detailModal')) document.getElementById('detailModal').style.display = 'none'; };
     
-    modalCloseBtn.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (e) => { if(e.target === modal) modal.style.display = 'none'; });
-    
-    // --------------------------------------------------------------
-    // 6.  بوت استرپ اصلی
-    // --------------------------------------------------------------
-    async function init() {
+    (async function() {
+        const stats = document.getElementById('statsBar');
         try {
-            const release = await fetchReleaseData();
-            if (!release) {
-                moviesContainer.innerHTML = '<div class="loading-skeleton"><i class="fas fa-exclamation-triangle"></i> No GitHub Release found. Please run the GitHub Action first.</div>';
-                return;
-            }
-            currentRelease = release;
-            await loadAllMovieFiles(release);
-            if(allMovies.length === 0) throw new Error('No movies loaded from JSON files');
-            updateFiltersAndChips();
-            renderMovies(filterMovies());
-            statsBar.innerHTML = `<span><i class="fas fa-check-circle"></i> Ready · ${allMovies.length.toLocaleString()} movies · ${extractUniqueYears().length} years</span>`;
-        } catch (err) {
-            console.error(err);
-            moviesContainer.innerHTML = `<div class="loading-skeleton"><i class="fas fa-bug"></i> Error: ${err.message}. Check release assets or network.</div>`;
-            statsBar.innerHTML = `<span><i class="fas fa-times-circle"></i> Initialization failed. ${err.message}</span>`;
-        } finally {
-            isLoading = false;
+            await loadAll();
+            if (allMovies.length === 0) throw new Error('No movies found. Check release tag and file paths.');
+            populateUI();
+            applyFilters();
+            stats.innerHTML = `<span><i class="fas fa-check-circle"></i> ✅ ${allMovies.length} movies · ${extractYears().length} years</span>`;
+        } catch(err) {
+            stats.innerHTML = `<span><i class="fas fa-exclamation-triangle"></i> ${err.message}</span>`;
+            document.getElementById('moviesContainer').innerHTML = `<div class="loading-skeleton">❌ ${err.message}<br>Make sure:<br>1. Release tag '${TAG}' exists<br>2. Files like 'movies_1990.json' are in /data/ folder<br>3. Repository name is correct: '${REPO_NAME}'</div>`;
         }
-    }
-    
-    init();
+    })();
 </script>
 </body>
 </html>
